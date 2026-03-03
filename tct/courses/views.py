@@ -179,16 +179,16 @@ class CourseBulkImportView(APIView):
         service = CourseService()
         report = service.import_courses(file)
         errors = report["errors"]
-        # if errors:
-        #     error_file = service.generate_error_file(
-        #         errors
-        #     )
-        #     response = HttpResponse(
-        #         error_file,
-        #         content_type="text/csv"
-        #     )
-        #     response["Content-Disposition"] = (
-        #         "attachment; filename=import_errors.csv"
-        #     )
-        #     return response
+        if errors:
+            error_file = service.generate_error_file(
+                errors
+            )
+            response = HttpResponse(
+                error_file,
+                content_type="text/csv"
+            )
+            response["Content-Disposition"] = (
+                "attachment; filename=import_errors.csv"
+            )
+            return response
         return Response(report)

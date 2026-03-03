@@ -1,8 +1,8 @@
 from abc import ABC
 
 from django.db import transaction
-from rest_framework.exceptions import ValidationError
 
+from tct.file_service import FileService
 from tct.student.models import Student
 import pandas as pd
 from django.core.validators import validate_email
@@ -11,37 +11,11 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 class AbstractStudentService(ABC):
 
-    def read_file(self, file):
-        raise NotImplementedError
-
-    def validate_columns(self, df):
-        raise NotImplementedError
-
-    def clean_dataframe(self, df):
-        raise NotImplementedError
-
     def import_students(self, file):
         raise NotImplementedError
 
 
-class StudentDataService(AbstractStudentService):
-
-    REQUIRED_COLUMNS = ["student", "email"]
-
-    def read_file(self, file):
-        if file.name.endswith(".csv"):
-            return pd.read_csv(file)
-
-        if file.name.endswith(".xlsx"):
-            return pd.read_excel(file)
-        raise ValidationError("Only CSV or XLSX files are supported")
-
-    def validate_columns(self, df):
-        missing = set(self.REQUIRED_COLUMNS) - set(df.columns)
-        if missing:
-            raise ValidationError(
-                f"Missing columns: {list(missing)}"
-            )
+class StudentDataService(AbstractStudentService, FileService):
 
     def clean_dataframe(self, df):
         df = df.dropna(how="all")
@@ -52,7 +26,7 @@ class StudentDataService(AbstractStudentService):
 
     def import_students(self, file):
         df = self.read_file(file)
-        self.validate_columns(df)
+        self.validate_columns(df, "student")
         df = self.clean_dataframe(df)
 
         report = {

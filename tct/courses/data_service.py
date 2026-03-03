@@ -6,22 +6,15 @@ from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
 from tct.courses.models import Course
+from tct.file_service import FileService
 from tct.student.models import Student
 from tct.teacher.models import Teacher
 import pandas as pd
 
+
 class AbstractCourseService(ABC):
 
     def create_course(self, params: dict):
-        raise NotImplementedError
-
-    def read_file(self, file):
-        raise NotImplementedError
-
-    def validate_columns(self, df):
-        raise NotImplementedError
-
-    def clean_dataframe(self, df):
         raise NotImplementedError
 
     def preview_data(self, file):
@@ -37,15 +30,7 @@ class AbstractCourseService(ABC):
         raise NotImplementedError
 
 
-class CourseService(AbstractCourseService):
-
-    REQUIRED_COLUMNS = [
-        "name",
-        "teacher_id",
-        "starting_date",
-        "ending_date",
-        "students"
-    ]
+class CourseService(AbstractCourseService, FileService):
 
     def create_course(self, params: dict):
         try:
@@ -54,21 +39,6 @@ class CourseService(AbstractCourseService):
             raise ValidationError("Teacher not found!")
 
         return Course.objects.create(**params)
-
-    def read_file(self, file):
-        if file.name.endswith(".csv"):
-            return pd.read_csv(file)
-
-        if file.name.endswith(".xlsx"):
-            return pd.read_excel(file)
-        raise ValidationError("Only CSV or XLSX files are supported")
-
-    def validate_columns(self, df):
-        missing = set(self.REQUIRED_COLUMNS) - set(df.columns)
-        if missing:
-            raise ValidationError(
-                f"Missing columns: {list(missing)}"
-            )
 
     def clean_dataframe(self, df):
         df["starting_date"] = pd.to_datetime(df["starting_date"])
@@ -83,7 +53,7 @@ class CourseService(AbstractCourseService):
 
     def preview_data(self, file):
         df = self.read_file(file)
-        self.validate_columns(df)
+        self.validate_columns(df, "course")
         df = self.clean_dataframe(df)
         return {
             "rows_detected": len(df),
@@ -92,7 +62,7 @@ class CourseService(AbstractCourseService):
 
     def import_courses(self, file):
         df = self.read_file(file)
-        self.validate_columns(df)
+        self.validate_columns(df, "course")
         df = self.clean_dataframe(df)
 
         df = df.dropna(how="all")
