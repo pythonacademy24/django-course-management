@@ -9,7 +9,11 @@ from django.core.exceptions import ValidationError
 class AbstractEnrollmentService(ABC):
 
     @staticmethod
-    def enroll_student(course_id, student_ids):
+    def enroll_student(course_id, student_id):
+        raise NotImplementedError
+
+    @staticmethod
+    def drop_student(course_id, student_id):
         raise NotImplementedError
 
 
@@ -29,4 +33,16 @@ class EnrollmentService(AbstractEnrollmentService):
             student=student,
             course=course
         )
+        return enrollment
+
+    @staticmethod
+    def drop_student(course_id, student_id):
+        enrollment = Enrollment.objects.get(
+            student_id=student_id,
+            course_id=course_id
+        )
+        if not enrollment:
+            raise ValidationError("Student not enrolled to this course!!")
+        enrollment.status = "dropped"
+        enrollment.save()
         return enrollment

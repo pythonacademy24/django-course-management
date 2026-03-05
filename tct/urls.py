@@ -1,7 +1,8 @@
 from django.urls import path
 from tct.courses.views import (
    CourseListView, CourseCreateView,
-   CourseListFilteredView, CourseUpdateDeleteView, CourseEnrollView, CourseUnrollView, CourseBulkImportView
+   CourseListFilteredView, CourseUpdateDeleteView, CourseEnrollView, CourseUnrollView, CourseBulkImportView,
+   EnrollStudentView, DropStudentView
 )
 
 from tct.teacher.views import (
@@ -23,6 +24,8 @@ urlpatterns = [
    path("course/<int:pk>/enroll", CourseEnrollView.as_view(), name='enroll-student'),
    path("course/<int:pk>/unroll", CourseUnrollView.as_view(), name='unroll-student'),
    path("course-create-bulk", CourseBulkImportView.as_view(), name='course-create-bulk'),
+   path("enroll-student", EnrollStudentView.as_view(), name='enroll-student'),
+   path("drop-student", DropStudentView.as_view(), name='drop-student'),
 
    # teacher views
    path("teacher/<int:pk>", TeacherListView.as_view(), name='teacher-list'),

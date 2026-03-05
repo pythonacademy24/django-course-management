@@ -200,13 +200,30 @@ class EnrollStudentView(APIView):
     def post(self, request):
         serializer = EnrollmentSerializer(data=request.data)
         if serializer.is_valid():
-            _ = EnrollmentService.enroll_student(
+            _ = EnrollmentService().enroll_student(
                 serializer.validated_data["student_id"],
                 serializer.validated_data["course_id"]
             )
             return Response(
                 {
                     "message": "Student enrolled successfully!!"
+                },
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DropStudentView(APIView):
+    def post(self, request):
+        serializer = EnrollmentSerializer(data=request.data)
+        if serializer.is_valid():
+            _ = EnrollmentService().drop_student(
+                serializer.validated_data["student_id"],
+                serializer.validated_data["course_id"]
+            )
+            return Response(
+                {
+                    "message": "Student dropped successfully!!"
                 },
                 status=status.HTTP_201_CREATED
             )
