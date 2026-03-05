@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from tct.courses.models import Course
-from tct.teacher.models import Teacher
 from tct.teacher.serializers import TeacherSerializer
 from tct.student.serializers import StudentSerializer
 

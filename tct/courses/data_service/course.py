@@ -5,7 +5,7 @@ from abc import ABC
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
-from tct.courses.models import Course
+from tct.courses.models.course import Course
 from tct.file_service import FileService
 from tct.student.models import Student
 from tct.teacher.models import Teacher

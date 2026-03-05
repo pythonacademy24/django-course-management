@@ -4,9 +4,11 @@ from django.http import HttpResponse
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
-from tct.courses.data_service import CourseService
-from tct.courses.models import Course
-from tct.courses.serializers import CourseReadSerializer, CourseUpdateSerializer, CourseCreateSerializer
+from tct.courses.data_service.course import CourseService
+from tct.courses.data_service.enrollment import EnrollmentService
+from tct.courses.models.course import Course
+from tct.courses.serializers import EnrollmentSerializer
+from tct.courses.serializers.course import CourseReadSerializer, CourseUpdateSerializer, CourseCreateSerializer
 from tct.pagination import TCTPagination
 from tct.utils import enroll_student, unroll_student
 
@@ -192,3 +194,20 @@ class CourseBulkImportView(APIView):
             )
             return response
         return Response(report)
+
+
+class EnrollStudentView(APIView):
+    def post(self, request):
+        serializer = EnrollmentSerializer(data=request.data)
+        if serializer.is_valid():
+            _ = EnrollmentService.enroll_student(
+                serializer.validated_data["student_id"],
+                serializer.validated_data["course_id"]
+            )
+            return Response(
+                {
+                    "message": "Student enrolled successfully!!"
+                },
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
