@@ -33,6 +33,10 @@ class AbstractCourseService(ABC):
     def get_course_progress(course_id):
         raise NotImplementedError
 
+    @staticmethod
+    def change_status(course_id, status):
+        raise NotImplementedError
+
 
 class CourseService(AbstractCourseService, FileService):
 
@@ -216,4 +220,13 @@ class CourseService(AbstractCourseService, FileService):
         progress = (passed_days / total_days) * 100
         progress = max(0, min(progress, 100))
         return round(progress, 2)
+
+    @staticmethod
+    def change_status(course_id, status):
+        course = Course.objects.get(id=course_id)
+        if not course:
+            raise ValidationError("Course does not exist!!")
+        course.status = status
+        course.save()
+        return course
 

@@ -2,7 +2,7 @@ from django.urls import path
 from tct.courses.views import (
    CourseListView, CourseCreateView,
    CourseListFilteredView, CourseUpdateDeleteView, CourseEnrollView, CourseUnrollView, CourseBulkImportView,
-   EnrollStudentView, DropStudentView, CourseProgressView
+   EnrollStudentView, DropStudentView, CourseProgressView, CourseStatusUpdateView
 )
 
 from tct.teacher.views import (
@@ -27,6 +27,7 @@ urlpatterns = [
    path("enroll-student", EnrollStudentView.as_view(), name='enroll-student'),
    path("drop-student", DropStudentView.as_view(), name='drop-student'),
    path("course-progress", CourseProgressView.as_view(), name='course-progress'),
+   path("course-update-status", CourseStatusUpdateView.as_view(), name='course-update-status'),
 
    # teacher views
    path("teacher/<int:pk>", TeacherListView.as_view(), name='teacher-list'),

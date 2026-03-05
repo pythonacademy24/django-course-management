@@ -239,3 +239,19 @@ class CourseProgressView(APIView):
                 "progress": progress
             }
         )
+
+
+class CourseStatusUpdateView(APIView):
+    def patch(self, request, course_id):
+        status = request.data.get("status")
+        course = CourseService().change_status(
+            course_id=course_id,
+            status=status
+        )
+        return Response(
+            {
+                "message": "Status updated successfully!!",
+                "course_new_status": course.status
+            },
+            status=status.HTTP_200_OK
+        )
