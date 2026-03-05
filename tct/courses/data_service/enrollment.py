@@ -5,14 +5,15 @@ from tct.courses.models.course import Course
 from tct.student.models import Student
 from django.core.exceptions import ValidationError
 
-class AbstractEnrollment(ABC):
+
+class AbstractEnrollmentService(ABC):
 
     @staticmethod
     def enroll_student(course_id, student_ids):
         raise NotImplementedError
 
 
-class EnrollmentService(ABC):
+class EnrollmentService(AbstractEnrollmentService):
 
     @staticmethod
     def enroll_student(course_id, student_id):
