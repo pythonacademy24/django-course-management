@@ -10,7 +10,7 @@ from tct.file_service import FileService
 from tct.student.models import Student
 from tct.teacher.models import Teacher
 import pandas as pd
-
+from datetime import date
 
 class AbstractCourseService(ABC):
 
@@ -27,6 +27,10 @@ class AbstractCourseService(ABC):
         raise NotImplementedError
 
     def generate_error_file(self, errors):
+        raise NotImplementedError
+
+    @staticmethod
+    def get_course_progress(course_id):
         raise NotImplementedError
 
 
@@ -198,5 +202,18 @@ class CourseService(AbstractCourseService, FileService):
         buffer.seek(0)
         return buffer
 
+    @staticmethod
+    def get_course_progress(course_id):
+        course = Course.objects.get(id=course_id)
+        if not course:
+            raise ValidationError("Course does not exist!!")
 
+        today = date.today()
+        total_days = (course.ending_date - course.starting_date).days
+        passed_days = (today - course.starting_date).days
+        if total_days <= 0:
+            return 0
+        progress = (passed_days / total_days) * 100
+        progress = max(0, min(progress, 100))
+        return round(progress, 2)
 

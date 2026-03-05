@@ -228,3 +228,14 @@ class DropStudentView(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseProgressView(APIView):
+    def get(self, request, course_id):
+        progress = CourseService().get_course_progress(course_id)
+        return Response(
+            {
+                "course_id": course_id,
+                "progress": progress
+            }
+        )
